@@ -3,3 +3,4 @@ rstg_env/
 ppts/
 output/*/
 .env
+deepgram_test/

@@ -85,6 +85,11 @@ def generate_next_slide(content_json, transcript):
     nxt_slide_content = generate_content(model, curr_slide_summary, transcript)
     return nxt_slide_content
 
+def fetch_transcript(trs_file_path):
+    with open(trs_file_path, 'r') as file:
+        transcript = file.read()
+    return transcript
+        
 def fetch_seed_content(json_file_path):
     with open(json_file_path, 'r') as file:
         slide_seed = json.load(file)
@@ -96,20 +101,24 @@ def save_slide_content_to_json(slide_content, file_path):
 
 
 def main():
+    slide_num = 1
     load_dotenv(find_dotenv())
     print(os.environ['OPENAI_API_KEY'])
-    SEED_PATH = "data/1.json"
-    content_json = fetch_seed_content(SEED_PATH)
-    transcript = """
-    I have a doubt related to Gaussian Distributions.
-    Sure, ask.
-    I am confused between Culminative Density Function and Probibility function, can you explain the difference between them?
-    Sure, I can, but let me know what kind of difference you would like to know.
-    Yes, so if you can provide and differenciate the definitions between the two. 
-    I see, should I also provide mathematical expressions for each, will that help to differenciate between them?
-    Yes that would be quite helpful.
-    Sure, the next slide will have the difference between the two and differnciate their mathematical expressions.
-    """
+    PREV_SLIDE_PATH = f'data/{slide_num}.json'
+    TRANSCRIPTS_PATH = f'output/buffer/transcripts/{slide_num}.txt'
+    content_json = fetch_seed_content(PREV_SLIDE_PATH)
+    # transcript = """
+    # I have a doubt related to Gaussian Distributions.
+    # Sure, ask.
+    # I am confused between Culminative Density Function and Probibility function, can you explain the difference between them?
+    # Sure, I can, but let me know what kind of difference you would like to know.
+    # Yes, so if you can provide and differenciate the definitions between the two. 
+    # I see, should I also provide mathematical expressions for each, will that help to differenciate between them?
+    # Yes that would be quite helpful.
+    # Sure, the next slide will have the difference between the two and differnciate their mathematical expressions.
+    # """
+    transcript = fetch_transcript(TRANSCRIPTS_PATH)
+    print(transcript)
 
     next_slide_content = generate_next_slide(content_json["slides"][-1], transcript)
     content_json["slides"].append(next_slide_content)
