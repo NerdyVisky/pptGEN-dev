@@ -1,0 +1,5 @@
+rstg_env/
+*/__pycache__/
+ppts/
+output/*/
+.env

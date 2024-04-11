@@ -1,0 +1,21 @@
+{
+    "presentation_ID": 1,
+    "topic": "Gaussian Distribution",
+    "slides": [
+        {
+            "slide_number": 1,
+            "title": "Definition and Characteristics",
+            "description": "A Gaussian distribution is characterized by its bell-shaped curve, defined by two parameters: mean (mu) and variance (sigma squared), which determine its center and width respectively.",
+            "enumeration": [],
+            "equations": [
+                {
+                    "eq_desc": "Probability Density Function of a the Gaussian distribution",
+                    "tex_code": "\\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{1}{2}\\left(\\frac{x-\\mu}{\\sigma}\\right)^2}"
+                }
+            ],
+            "tables": [],
+            "figures": []
+        }
+    ]
+    
+}

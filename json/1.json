@@ -1,0 +1,154 @@
+{
+   "slide_id": "1",
+   "n_slides": 2,
+   "topic": "Gaussian Distribution",
+   "presenter": "Dr. Fiona O'Malley",
+   "date": "March 28th",
+   "slides": [
+      {
+         "pg_no": 1,
+         "bg_color": {
+            "r": 163,
+            "g": 168,
+            "b": 24
+         },
+         "slide_layout": 2,
+         "elements": {
+            "title": [
+               {
+                  "label": "text",
+                  "value": "Definition and Characteristics",
+                  "xmin": 0.5,
+                  "ymin": 0.3,
+                  "width": 9,
+                  "height": 1.25,
+                  "style": {
+                     "font_name": "Arial",
+                     "font_size": 44,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               }
+            ],
+            "description": [
+               {
+                  "label": "text",
+                  "value": "A Gaussian distribution is characterized by its bell-shaped curve, defined by two parameters: mean (mu) and variance (sigma squared), which determine its center and width respectively.",
+                  "xmin": 5,
+                  "ymin": 2,
+                  "width": 4.5,
+                  "height": 4,
+                  "style": {
+                     "font_name": "Georgia",
+                     "font_size": 26,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               }
+            ],
+            "equations": [
+               {
+                  "label": "equation",
+                  "xmin": 0.5,
+                  "ymin": 2,
+                  "width": 4.5,
+                  "height": 1.0729166666666667,
+                  "desc": "Probability Density Function of a the Gaussian distribution",
+                  "path": "output/equations/resized\\1_0.png"
+               }
+            ],
+            "tables": [],
+            "figures": []
+         }
+      },
+      {
+         "pg_no": 2,
+         "bg_color": {
+            "r": 163,
+            "g": 168,
+            "b": 24
+         },
+         "slide_layout": 6,
+         "elements": {
+            "title": [
+               {
+                  "label": "text",
+                  "value": "Cumulative Density Function vs Probability Density Function",
+                  "xmin": 0.5,
+                  "ymin": 0.3,
+                  "width": 9,
+                  "height": 1.25,
+                  "style": {
+                     "font_name": "Arial",
+                     "font_size": 44,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               }
+            ],
+            "description": [
+               {
+                  "label": "text",
+                  "value": "This slide explains the difference between Cumulative Density Function (CDF) and Probability Density Function (PDF) in the context of Gaussian distributions. It clarifies the definitions of CDF and PDF and provides mathematical expressions to differentiate between them.",
+                  "xmin": 5,
+                  "ymin": 2,
+                  "width": 4.5,
+                  "height": 4,
+                  "style": {
+                     "font_name": "Georgia",
+                     "font_size": 26,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               }
+            ],
+            "equations": [
+               {
+                  "label": "equation",
+                  "xmin": 0.5,
+                  "ymin": 2,
+                  "width": 4.5,
+                  "height": 0.90625,
+                  "desc": "Probability Density Function (PDF)",
+                  "path": "output/equations/resized\\2_0.png"
+               },
+               {
+                  "label": "equation",
+                  "xmin": 0.5,
+                  "ymin": 4,
+                  "width": 4.5,
+                  "height": 0.71875,
+                  "desc": "Cumulative Density Function (CDF)",
+                  "path": "output/equations/resized\\2_1.png"
+               }
+            ],
+            "tables": [],
+            "figures": []
+         }
+      }
+   ]
+}
