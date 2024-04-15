@@ -36,7 +36,9 @@ def generate_random_font(element):
     if element == "title":
         font_size = random.randint(18, 27) * 2
     elif element == "description":
-        font_size = random.randint(20, 28)
+        font_size = random.randint(16, 20)
+    elif element == 'enumeration':
+        font_size = random.randint(18, 24)
     return {
         "font_size": font_size,
         "bold": bold,
@@ -64,7 +66,33 @@ def generate_random_date():
     
     return date_str.strftime(chosen_format)
 
+def generate_footer_obj():
+    showSN = random.random() > 0.25
+    showDt = random.random() > 0.5
+    showFN = random.random() > 0.75 
+    total_footer_elements = 0
+    if showSN:
+        total_footer_elements += 1
+    if showDt:
+        total_footer_elements += 1
+    if showFN:
+        total_footer_elements += 1
+    inds = random.sample(range(3), total_footer_elements)
+    i = 0
+    footer_inds = []
+    if showSN:
+        footer_inds.append({"slideNr": inds[i]})
+        i+=1
+    if showDt:
+        footer_inds.append({"date": inds[i]})
+        i+=1
+    if showFN:
+        footer_inds.append({"footnote": inds[i]})
+        i+=1
+    return footer_inds
 
+
+    
 def generate_random_style_obj():
     style_obj = {}
     style_obj["bg_color"] = generate_random_color()
@@ -72,7 +100,8 @@ def generate_random_style_obj():
     style_obj["title_font_bold"] = random.random() > 0.75
     style_obj["title_font_attr"] = generate_random_font("title")
     style_obj["desc_font_family"] = pick_random(FONT_STYLES)
-    style_obj["desc_font_attr"] = generate_random_font("description") 
+    style_obj["desc_font_attr"] = generate_random_font("description")
+    style_obj["date"] = generate_random_date()
     return style_obj
 
 def pick_random(list_name):

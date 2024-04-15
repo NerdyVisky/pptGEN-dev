@@ -6,6 +6,7 @@ from utils.random_generator import (generate_random_style_obj,
                               generate_random_font, 
                               generate_random_value, 
                               pick_random, 
+                              generate_footer_obj,
                               generate_random_layout, 
                               generate_n_numbers_with_sum, 
                               generate_contrasting_font_color,
@@ -14,10 +15,21 @@ from utils.random_generator import (generate_random_style_obj,
 import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
+from io import BytesIO 
 import subprocess
 import fitz
 
 
+
+def count_footer_elements(date, showFN, showSN):
+    footer_elements = []
+    if date != None:
+        footer_elements.append("date")
+    if showSN == True:
+        footer_elements.append("slideNr")
+    if showFN == True:
+        footer_elements.append("footnote")
+    return footer_elements
 
 def count_body_elements(data, slide_number):
     ttl_desc = 0
@@ -37,30 +49,6 @@ def count_body_elements(data, slide_number):
         elif k == 'figures' and v:
             ttl_fig = len(v)
     return [ttl_desc, ttl_enum, ttl_eq, ttl_tb, ttl_fig]
-
-def get_eq_img_path(tex_code, slide_number, eq_num):
-    img_dir = 'output/equations'
-    img_name = f'eq_{slide_number}_{eq_num + 1}.png'
-    dpi = 600
-    tex_file = f'tmp.tex'
-    with open(tex_file, 'w') as latexfile:
-        latexfile.write('\\documentclass[preview]{standalone}\n')
-        latexfile.write('\\begin{document}\n')
-        latexfile.write('%s\n' % tex_code)
-        latexfile.write('\\end{document}\n')
-    subprocess.call(['pdflatex', '-interaction=nonstopmode', tex_file], creationflags=subprocess.CREATE_NO_WINDOW)
-    doc = fitz.open(f'tmp.pdf')
-    page = doc[0]
-    content_rect = page.rect
-    content_width_inches = content_rect.width / 72
-    content_height_inches = content_rect.height / 72
-    image_width = int(content_width_inches * dpi)
-    image_height = int(content_height_inches * dpi)
-    pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72), clip=content_rect)
-    pix.save(img_name)
-    img_path = os.path.join(img_dir, img_name)
-    os.rename(img_name, img_path)
-    return img_path
 
 def resize_image(input_image_path, slide_number, i, output_image_dir, box_width, box_height, dpi=96):
     box_width_pixels = int(box_width * dpi)
@@ -82,26 +70,74 @@ def resize_image(input_image_path, slide_number, i, output_image_dir, box_width,
         new_height_inches = new_height / dpi
         return new_img_path, new_width_inches, new_height_inches
 
-def get_tab_img_path(tex_code, slide_number, tab_num):
-    img_dir = 'output/tables'
-    img_name = f'tab_{slide_number}_{tab_num + 1}.png'
+def get_eq_img_path(tex_code, slide_number, eq_num):
+    img_dir = 'output/equations/'
+    img_name = f'eq_{slide_number}_{eq_num + 1}.png'
     dpi = 600
     tex_file = f'tmp.tex'
     with open(tex_file, 'w') as latexfile:
         latexfile.write('\\documentclass[preview]{standalone}\n')
+        latexfile.write('\\usepackage{tikz}\n')
+        latexfile.write('\\usepackage{graphicx}\n')
         latexfile.write('\\begin{document}\n')
         latexfile.write('%s\n' % tex_code)
         latexfile.write('\\end{document}\n')
     subprocess.call(['pdflatex', '-interaction=nonstopmode', tex_file], creationflags=subprocess.CREATE_NO_WINDOW)
     doc = fitz.open(f'tmp.pdf')
-    page = doc[0]
-    content_rect = page.rect
-    content_width_inches = content_rect.width / 72
-    content_height_inches = content_rect.height / 72
-    image_width = int(content_width_inches * dpi)
-    image_height = int(content_height_inches * dpi)
-    pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72), clip=content_rect)
+    pix = doc[0].get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))
     pix.save(img_name)
+    img_path = os.path.join(img_dir, img_name)
+    os.rename(img_name, img_path)
+    return img_path
+
+def get_tab_img_path(tex_code, slide_number, tab_num):
+    img_dir = 'output/tables/'
+    img_name = f'tab_{slide_number}_{tab_num + 1}.png'
+    dpi = 600
+    tex_file = f'tmp.tex'
+    with open(tex_file, 'w') as latexfile:
+        latexfile.write('\\documentclass[preview]{standalone}\n')
+        latexfile.write('\\usepackage{tikz}\n')
+        latexfile.write('\\usepackage{graphicx}\n')
+        latexfile.write('\\begin{document}\n')
+        latexfile.write('%s\n' % tex_code)
+        latexfile.write('\\end{document}\n')
+    subprocess.call(['pdflatex', '-interaction=nonstopmode', tex_file], creationflags=subprocess.CREATE_NO_WINDOW)
+    doc = fitz.open(f'tmp.pdf')
+    pix = doc[0].get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))
+    pix.save(img_name)
+    img_path = os.path.join(img_dir, img_name)
+    os.rename(img_name, img_path)
+    return img_path
+
+def get_fig_img_path(tex_code, slide_number, fig_num):
+    img_dir = 'output/figures/'
+    img_name = f'fig_{slide_number}_{fig_num + 1}.png'
+    dpi = 600
+    tex_file = f'tmp.tex'
+    with open(tex_file, 'w') as latexfile:
+        latexfile.write('\\documentclass[preview]{standalone}\n')
+        latexfile.write('\\usepackage{tikz}\n')
+        latexfile.write('\\usepackage{graphicx}\n')
+        latexfile.write('\\begin{document}\n')
+        latexfile.write('%s\n' % tex_code)
+        latexfile.write('\\end{document}\n')
+    subprocess.call(['pdflatex', '-interaction=nonstopmode', tex_file], creationflags=subprocess.CREATE_NO_WINDOW)
+    doc = fitz.open(f'tmp.pdf')
+    pix = doc[0].get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))
+    pix.save(img_name)
+    img_path = os.path.join(img_dir, img_name)
+    os.rename(img_name, img_path)
+    return img_path    
+
+def get_fig_img_path_matplot(tex_code, slide_number, fig_num):
+    img_dir = 'output/figures/'
+    img_name = f'fig_{slide_number}_{fig_num + 1}.png'
+    dpi = 600
+    plt.figure(figsize=(8, 6))
+    exec(tex_code)
+    plt.savefig(img_name)
+    
     img_path = os.path.join(img_dir, img_name)
     os.rename(img_name, img_path)
     return img_path
@@ -111,16 +147,42 @@ def remove_tmp_files():
     os.remove(f'tmp.aux')
     os.remove(f'tmp.log')
     os.remove(f'tmp.pdf')
+    tmp_eqs = 'output/equations'
+    for filename in os.listdir(tmp_eqs):
+            file_path = os.path.join(tmp_eqs, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                
+    tmp_tabs = 'output/tables'
+    for filename in os.listdir(tmp_tabs):
+            file_path = os.path.join(tmp_tabs, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+            
+    tmp_figs = 'output/figures'
+    for filename in os.listdir(tmp_figs):
+            file_path = os.path.join(tmp_figs, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
 
-def generate_random_slide(slide_number, data, style_obj):
+def generate_random_slide(slide_number, data, style_obj, footer_obj, presentation_ID):
     bg_color, title_font_family, title_font_bold, title_font_attr, desc_font_family, desc_font_attr = style_obj["bg_color"], style_obj["title_font_family"], style_obj["title_font_bold"], style_obj["title_font_attr"], style_obj["desc_font_family"], style_obj["desc_font_attr"]
+    date = style_obj["date"]
     # Determining when a slide has BG as White
     THRES = 0.667
     if generate_random_value(float, 0, 1) < THRES:
         bg_color = {"r": 255, "g": 255, "b": 255}
+    # # Define total number of body elements
+    # if slide_number == 1:
+    #     total_body_elements = 0
+    # else:
+    #     total_body_elements = generate_random_value(int, 1, 3)
     n_elements_list = count_body_elements(data, slide_number)
     total_body_elements = sum(n_elements_list)
+    # n_elements_list = [descriptions, enumerations, figures]
+    # n_elements_list = generate_n_numbers_with_sum(total_body_elements, 3)
+    # Distribute the total count among the three categories
 
 
     # Generate random slide layout
@@ -194,13 +256,20 @@ def generate_random_slide(slide_number, data, style_obj):
 
         ## Generate Enumerations
         for _ in range(n_elements_list[1]):
-            font_obj = generate_random_font("description")
+            font_obj = generate_random_font("enumeration")
             enum = data["slides"][slide_number - 1]["enumeration"]
             enum_instance = {
             "label": "enumeration",
-            "value": enum,
+            "heading": {
+                "value": enum[0],
+                "xmin": all_dims['body'][element_index]['left'],
+                "ymin": all_dims['body'][element_index]['top'],
+                "width": all_dims['body'][element_index]['width'],
+                "height": 0.5,
+            },
+            "value": enum[1:],
             "xmin": all_dims['body'][element_index]['left'],
-            "ymin": all_dims['body'][element_index]['top'],
+            "ymin": all_dims['body'][element_index]['top'] + 0.5,
             "width": all_dims['body'][element_index]['width'],
             "height": max(all_dims['body'][element_index]['height'], 0.5*len(enum)),
             "style": {
@@ -216,7 +285,10 @@ def generate_random_slide(slide_number, data, style_obj):
             element_index += 1
         
         # Render Equations
-        resized_path = 'output/equations/resized'
+        resized_path = f'output/equations/{presentation_ID}'
+        if not os.path.exists(resized_path):
+            os.makedirs(resized_path)
+
         slide['elements']['equations'] = []
         for i in range(n_elements_list[2]):
             img_path = get_eq_img_path(data["slides"][slide_number - 1]["equations"][i]['tex_code'], slide_number, i)
@@ -235,7 +307,10 @@ def generate_random_slide(slide_number, data, style_obj):
             remove_tmp_files()
 
         # Render Tables
-        resized_path = 'output/tables/resized'
+        resized_path = f'output/tables/{presentation_ID}'
+        if not os.path.exists(resized_path):
+            os.makedirs(resized_path)
+
         slide['elements']['tables'] = []
         for i in range(n_elements_list[3]):
             img_path = get_tab_img_path(data["slides"][slide_number - 1]["tables"][i]['tex_code'], slide_number, i)
@@ -253,20 +328,80 @@ def generate_random_slide(slide_number, data, style_obj):
             element_index += 1
             remove_tmp_files()
 
-        ## Render figures
+        # Render Figures
+        resized_path = f'output/figures/{presentation_ID}'
+        if not os.path.exists(resized_path):
+            os.makedirs(resized_path)
+
         slide['elements']['figures'] = []
         for i in range(n_elements_list[4]):
+            font_obj = generate_random_font("enumeration")
+            # if data["slides"][slide_number - 1]["figures"][i]["label"] == "diagram":    
+            #     img_path = get_fig_img_path_matplot(data["slides"][slide_number - 1]["figures"][i]['fig_code'], slide_number, i)
+            # else:
+            img_path = get_fig_img_path(data["slides"][slide_number - 1]["figures"][i]['fig_code'], slide_number, i)
+            resized_img_path, n_w, n_h = resize_image(img_path, slide_number, i, resized_path, all_dims['body'][element_index]['width'], all_dims['body'][element_index]['height'])
             fig_instance = {
             "label": data["slides"][slide_number - 1]["figures"][i]["label"],
+            "caption": {
+                "value": data["slides"][slide_number - 1]["figures"][i]["fig_desc"],
+                "xmin": all_dims['body'][element_index]['left'],
+                "ymin": all_dims['body'][element_index]['top'] + (all_dims['body'][element_index]['height'] - 0.25),
+                "width": all_dims['body'][element_index]['width'],
+                "height": 0.5,
+                "style": {
+                    "font_name": desc_font_family,
+                    "font_size": 14,
+                    "font_color": font_color,
+                    "bold": font_obj["bold"],
+                    "italics": True,
+                    "underlined": font_obj["underline"]
+               }
+            },
             "xmin": all_dims['body'][element_index]['left'],
             "ymin": all_dims['body'][element_index]['top'],
             "width": all_dims['body'][element_index]['width'],
-            "height": all_dims['body'][element_index]['height'],
+            "height": all_dims['body'][element_index]['height'] - 0.25,
             "desc": data["slides"][slide_number - 1]["figures"][i]["fig_desc"],
-            "path": 'data\imgs\\frog_img.png'
+            "path": resized_img_path
             }
             slide['elements']['figures'].append(fig_instance)
             element_index += 1
+            remove_tmp_files()
+        
+
+    ##Footer generation
+    slide['elements']['footer'] = []
+    for i, obj in enumerate(footer_obj):
+        footer_type = ''
+        if 'slideNr' in obj.keys():
+            footer_type = 'slideNr'
+            value = str(slide_number)
+        if 'footnote' in obj.keys():
+            footer_type = 'footnote'
+            value = "This is a footnote"
+        if 'date' in obj.keys():
+            footer_type = 'date'
+            value = date         
+        footer_dim = all_dims['footer'][obj[footer_type]]
+        foot_instance = {
+                "label": footer_type,
+                "location": footer_dim["type"],
+                "value": value,
+                "xmin": footer_dim['left'],
+                "ymin": footer_dim['top'],
+                "width": footer_dim['width'],
+                "height": footer_dim['height'],
+                "style": {
+                    "font_name": desc_font_family,
+                    "font_size": desc_font_attr["font_size"],
+                    "font_color": font_color,
+                    "bold": False,
+                    "italics": False,
+                    "underlined": False
+                }
+            }
+        slide['elements']['footer'].append(foot_instance)
     
     return slide
 
@@ -274,18 +409,19 @@ def generate_random_slide(slide_number, data, style_obj):
 
 if __name__ == "__main__":
     # num_files = 3
-    buffer_dir = 'output'
+    buffer_dir = 'output/buffer/content_json'
     json_files = [f for f in os.listdir(buffer_dir) if f.endswith('.json')]
 
     for json_file in json_files: 
         style_obj = generate_random_style_obj()
+        footer_obj = generate_footer_obj()
         # print(style_obj)
         slide_id, _ = os.path.splitext(json_file)
         file_path = os.path.join(buffer_dir, json_file)
         with open(file_path, 'r') as file:
             data = json.load(file)
         n_slides = len(data["slides"])
-        slides = [generate_random_slide(i+1, data, style_obj) for i in range(n_slides)]
+        slides = [generate_random_slide(i+1, data, style_obj, footer_obj, slide_id) for i in range(n_slides)]
     
         new_data = {
             "slide_id": slide_id,
@@ -295,7 +431,7 @@ if __name__ == "__main__":
             "date": generate_random_date(),
             "slides": slides
         }
-        with open(f"output\\buffer\\{slide_id}.json", 'w') as json_file:
+        with open(f"output/{slide_id}.json", 'w') as json_file:
             json.dump(new_data, json_file, indent=3)
         print(f"{slide_id} JSON file created successfully")
     

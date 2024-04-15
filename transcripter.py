@@ -5,6 +5,9 @@ import json
 import os
 import sys
 import websockets
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 from datetime import datetime
 from utils.deepgram_argparser import parse_args
@@ -190,10 +193,11 @@ def main():
     input = args.input
     format = args.format.lower()
     host = args.host
+    API_KEY = os.environ['DEEPGRAM_API_KEY']
 
     try:
         if input.lower().startswith("mic"):
-            asyncio.run(run(args.key, "mic", format, model=args.model, tier=args.tier, host=host, timestamps=args.timestamps))
+            asyncio.run(run(API_KEY, "mic", format, model=args.model, tier=args.tier, host=host, timestamps=args.timestamps))
         else:
             raise argparse.ArgumentTypeError(
                 f'🔴 {input} is an invalid input. Please enter the path to a WAV file, a valid stream URL, or "mic" to stream from your microphone.'

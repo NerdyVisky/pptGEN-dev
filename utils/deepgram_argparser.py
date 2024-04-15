@@ -50,9 +50,6 @@ def parse_args():
         description="Submits data to the real-time streaming endpoint."
     )
     parser.add_argument(
-        "-k", "--key", required=True, help="YOUR_DEEPGRAM_API_KEY (authorization)"
-    )
-    parser.add_argument(
         "-i",
         "--input",
         help='Input to stream to Deepgram. Can be "mic" to stream from your microphone (requires pyaudio), the path to a WAV file, or the URL to a direct audio stream. Defaults to the included file preamble.wav',

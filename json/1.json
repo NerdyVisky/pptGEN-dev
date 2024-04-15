@@ -2,17 +2,17 @@
    "slide_id": "1",
    "n_slides": 2,
    "topic": "Gaussian Distribution",
-   "presenter": "Dr. Fiona O'Malley",
-   "date": "March 28th",
+   "presenter": "Prof. Nathanial Lawson",
+   "date": "April 2024",
    "slides": [
       {
          "pg_no": 1,
          "bg_color": {
-            "r": 163,
-            "g": 168,
-            "b": 24
+            "r": 255,
+            "g": 255,
+            "b": 255
          },
-         "slide_layout": 2,
+         "slide_layout": 3,
          "elements": {
             "title": [
                {
@@ -23,8 +23,8 @@
                   "width": 9,
                   "height": 1.25,
                   "style": {
-                     "font_name": "Arial",
-                     "font_size": 44,
+                     "font_name": "Georgia",
+                     "font_size": 48,
                      "font_color": {
                         "r": 0,
                         "g": 0,
@@ -40,13 +40,13 @@
                {
                   "label": "text",
                   "value": "A Gaussian distribution is characterized by its bell-shaped curve, defined by two parameters: mean (mu) and variance (sigma squared), which determine its center and width respectively.",
-                  "xmin": 5,
-                  "ymin": 2,
-                  "width": 4.5,
-                  "height": 4,
+                  "xmin": 0.5,
+                  "ymin": 4.5,
+                  "width": 9,
+                  "height": 2.5,
                   "style": {
-                     "font_name": "Georgia",
-                     "font_size": 26,
+                     "font_name": "Arial",
+                     "font_size": 17,
                      "font_color": {
                         "r": 0,
                         "g": 0,
@@ -63,36 +63,101 @@
                   "label": "equation",
                   "xmin": 0.5,
                   "ymin": 2,
-                  "width": 4.5,
-                  "height": 1.0729166666666667,
+                  "width": 9.0,
+                  "height": 2.1458333333333335,
                   "desc": "Probability Density Function of a the Gaussian distribution",
-                  "path": "output/equations/resized\\1_0.png"
+                  "path": "output/equations/1\\1_0.png"
                }
             ],
             "tables": [],
-            "figures": []
+            "figures": [],
+            "footer": [
+               {
+                  "label": "slideNr",
+                  "location": 3,
+                  "value": "1",
+                  "xmin": 6.5,
+                  "ymin": 7,
+                  "width": 3,
+                  "height": 0.5,
+                  "style": {
+                     "font_name": "Arial",
+                     "font_size": 17,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               },
+               {
+                  "label": "date",
+                  "location": 1,
+                  "value": "08 Oct 2022",
+                  "xmin": 0.5,
+                  "ymin": 7,
+                  "width": 3,
+                  "height": 0.5,
+                  "style": {
+                     "font_name": "Arial",
+                     "font_size": 17,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               },
+               {
+                  "label": "footnote",
+                  "location": 2,
+                  "value": "This is a footnote",
+                  "xmin": 3.5,
+                  "ymin": 7,
+                  "width": 3,
+                  "height": 0.5,
+                  "style": {
+                     "font_name": "Arial",
+                     "font_size": 17,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               }
+            ]
          }
       },
       {
          "pg_no": 2,
          "bg_color": {
-            "r": 163,
-            "g": 168,
-            "b": 24
+            "r": 255,
+            "g": 255,
+            "b": 255
          },
-         "slide_layout": 6,
+         "slide_layout": 2,
          "elements": {
             "title": [
                {
                   "label": "text",
-                  "value": "Cumulative Density Function vs Probability Density Function",
+                  "value": "Real-Life Applications of Gaussian Distribution",
                   "xmin": 0.5,
                   "ymin": 0.3,
                   "width": 9,
                   "height": 1.25,
                   "style": {
-                     "font_name": "Arial",
-                     "font_size": 44,
+                     "font_name": "Georgia",
+                     "font_size": 48,
                      "font_color": {
                         "r": 0,
                         "g": 0,
@@ -107,14 +172,14 @@
             "description": [
                {
                   "label": "text",
-                  "value": "This slide explains the difference between Cumulative Density Function (CDF) and Probability Density Function (PDF) in the context of Gaussian distributions. It clarifies the definitions of CDF and PDF and provides mathematical expressions to differentiate between them.",
-                  "xmin": 5,
+                  "value": "Explore practical applications of Gaussian distribution in various fields, showcasing how mean and variance impact real-world scenarios. Understand the significance of Gaussian distribution in modeling natural phenomena and data analysis.",
+                  "xmin": 0.5,
                   "ymin": 2,
                   "width": 4.5,
-                  "height": 4,
+                  "height": 4.5,
                   "style": {
-                     "font_name": "Georgia",
-                     "font_size": 26,
+                     "font_name": "Arial",
+                     "font_size": 17,
                      "font_color": {
                         "r": 0,
                         "g": 0,
@@ -129,25 +194,81 @@
             "equations": [
                {
                   "label": "equation",
-                  "xmin": 0.5,
+                  "xmin": 5,
                   "ymin": 2,
                   "width": 4.5,
                   "height": 0.90625,
-                  "desc": "Probability Density Function (PDF)",
-                  "path": "output/equations/resized\\2_0.png"
-               },
-               {
-                  "label": "equation",
-                  "xmin": 0.5,
-                  "ymin": 4,
-                  "width": 4.5,
-                  "height": 0.71875,
-                  "desc": "Cumulative Density Function (CDF)",
-                  "path": "output/equations/resized\\2_1.png"
+                  "desc": "Probability Density Function for Gaussian Distribution",
+                  "path": "output/equations/1\\2_0.png"
                }
             ],
             "tables": [],
-            "figures": []
+            "figures": [],
+            "footer": [
+               {
+                  "label": "slideNr",
+                  "location": 3,
+                  "value": "2",
+                  "xmin": 6.5,
+                  "ymin": 7,
+                  "width": 3,
+                  "height": 0.5,
+                  "style": {
+                     "font_name": "Arial",
+                     "font_size": 17,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               },
+               {
+                  "label": "date",
+                  "location": 1,
+                  "value": "08 Oct 2022",
+                  "xmin": 0.5,
+                  "ymin": 7,
+                  "width": 3,
+                  "height": 0.5,
+                  "style": {
+                     "font_name": "Arial",
+                     "font_size": 17,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               },
+               {
+                  "label": "footnote",
+                  "location": 2,
+                  "value": "This is a footnote",
+                  "xmin": 3.5,
+                  "ymin": 7,
+                  "width": 3,
+                  "height": 0.5,
+                  "style": {
+                     "font_name": "Arial",
+                     "font_size": 17,
+                     "font_color": {
+                        "r": 0,
+                        "g": 0,
+                        "b": 0
+                     },
+                     "bold": false,
+                     "italics": false,
+                     "underlined": false
+                  }
+               }
+            ]
          }
       }
    ]

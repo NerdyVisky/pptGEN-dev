@@ -122,7 +122,7 @@ def main():
 
     next_slide_content = generate_next_slide(content_json["slides"][-1], transcript)
     content_json["slides"].append(next_slide_content)
-    OUTPUT_PATH = 'output/1.json'
+    OUTPUT_PATH = 'output/buffer/content_json/1.json'
     save_slide_content_to_json(content_json, OUTPUT_PATH)
 
 if __name__ == "__main__":
