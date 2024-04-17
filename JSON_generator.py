@@ -408,6 +408,7 @@ def generate_random_slide(slide_number, data, style_obj, footer_obj, presentatio
     
 
 if __name__ == "__main__":
+    print("\nGenerating JSON Payload...")
     # num_files = 3
     buffer_dir = 'output/buffer/content_json'
     json_files = [f for f in os.listdir(buffer_dir) if f.endswith('.json')]
@@ -431,9 +432,18 @@ if __name__ == "__main__":
             "date": generate_random_date(),
             "slides": slides
         }
-        with open(f"output/{slide_id}.json", 'w') as json_file:
-            json.dump(new_data, json_file, indent=3)
-        print(f"{slide_id} JSON file created successfully")
+        try:
+            with open(f"output/{slide_id}.json", 'w') as json_file:
+                json.dump(new_data, json_file, indent=3)
+            print(f"🟢 (1/1) JSON payload saved to output/{slide_id}.json")
+        except:
+            print(f"🔴 ERROR: Could not create JSON payload")
+
+        if os.path.exists('data/1234.json'):
+            os.remove('data/1234.json')
+            
+        os.rename(file_path, "data/1234.json")
+        
     
     # #Delete content JSON files
     # for json_file in json_files:

@@ -62,7 +62,7 @@ def generate_random_date():
     if "th" in chosen_format:
         date_str = datetime(year=random.randint(2018, 2024), month=random.randint(1, 12), day=random.randint(1, 28))  # Assuming maximum 28 days in a month for simplicity
     else:
-        date_str = datetime(year=random.randint(2018, 2024), month=random.randint(1, 12), day=random.randint(1, 30))
+        date_str = datetime(year=random.randint(2018, 2024), month=random.randint(1, 12), day=random.randint(1, 28))
     
     return date_str.strftime(chosen_format)
 

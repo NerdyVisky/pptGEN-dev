@@ -289,6 +289,7 @@ def load_json_payload(file_path):
 
 def main():
     # Load the JSON payload
+    print("\nGenerating final presentation...")
     buffer_folder_path = "output"
     base_topic_folder_path = "json"
 
@@ -302,8 +303,11 @@ def main():
 
         #Generate Presentation from JSON file and save it
         presentation_generator = PresentationGenerator(json_payload, slide_id)
-        presentation_generator.generate_presentation()
-        print(f"Presentation generated successfully for {slide_id}.")
+        try:
+            presentation_generator.generate_presentation()
+            print(f"🟢 (1/1) Presentation generated for {slide_id}.")
+        except:
+            print(f"🔴 ERROR: in generating presentation")
 
         #Move JSON file from buffer to respective topic folder
         if not os.path.exists(base_topic_folder_path):
@@ -314,7 +318,5 @@ def main():
         print(f"Moved {json_file} to {base_topic_folder_path}.")
         print('\n')
     
-    print("All presentations generated and files moved successfully.")
-
 if __name__ == "__main__":
     main()

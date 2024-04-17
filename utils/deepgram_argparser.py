@@ -64,7 +64,25 @@ def parse_args():
         help='Which model to make your request against. Defaults to none specified. See https://developers.deepgram.com/docs/models-overview for all model options.',
         nargs="?",
         const="",
-        default="general",
+        default="nova-2",
+    )
+    parser.add_argument(
+        "-s",
+        "--slide",
+        help='What should be the slide number of the next slide?',
+        nargs="?",
+        const="",
+        default=1,
+
+    )
+    parser.add_argument(
+        "-tp",
+        "--topic",
+        help='What should be the topic of the new presentation',
+        nargs="?",
+        const="",
+        default="Heap",
+
     )
     parser.add_argument(
         "-t",

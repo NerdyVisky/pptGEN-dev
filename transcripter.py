@@ -40,6 +40,7 @@ def mic_callback(input_data, frame_count, time_info, status_flag):
 
 async def run(key, method, format, **kwargs):
     deepgram_url = f'{kwargs["host"]}/v1/listen?punctuate=true'
+    STOP_WORDS = ['next', 'next?', 'goodbye']
 
     if kwargs["model"]:
         deepgram_url += f"&model={kwargs['model']}"
@@ -127,13 +128,17 @@ async def run(key, method, format, **kwargs):
                                 first_transcript = False
                             print(transcript)
                             all_transcripts.append(transcript)
+                        
+                        if method == "mic" and any(word in transcript.lower() for word in STOP_WORDS):
+                             await ws.send(json.dumps({"type": "CloseStream"}))
+                             print("🟢 (5/5) Successfully closed Deepgram connection, waiting for final transcripts if necessary")
 
-                        # if using the microphone, close stream if user says "goodbye"
-                        if method == "mic" and "goodbye" in transcript.lower():
-                            await ws.send(json.dumps({"type": "CloseStream"}))
-                            print(
-                                "🟢 (5/5) Successfully closed Deepgram connection, waiting for final transcripts if necessary"
-                            )
+                        # # if using the microphone, close stream if user says "goodbye"
+                        # if method == "mic" and "goodbye" in transcript.lower():
+                        #     await ws.send(json.dumps({"type": "CloseStream"}))
+                        #     print(
+                        #         "🟢 (5/5) Successfully closed Deepgram connection, waiting for final transcripts if necessary"
+                        #     )
 
                     # handle end of stream
                     if res.get("created"):
@@ -141,7 +146,7 @@ async def run(key, method, format, **kwargs):
                         transcript_file_path = os.path.abspath(
                             os.path.join(
                                 data_dir,
-                                '1.txt'
+                                f'{kwargs["slide"]}.txt'
                             )
                         )
                         
@@ -152,7 +157,7 @@ async def run(key, method, format, **kwargs):
                             f'🟢 Request finished with a duration of {res["duration"]} seconds. Exiting!'
                         )
                 except KeyError:
-                    print(f"🔴 ERROR: Received unexpected API response! {msg}")
+                    print(f":🔴 ERROR Received unexpected API response! {msg}")
 
         # Set up microphone if streaming from mic
         async def microphone():
@@ -187,17 +192,29 @@ async def run(key, method, format, **kwargs):
 
         await asyncio.gather(*functions)
 
+def generate_summary_file(topic, PATH='data/1234.json'):
+    if not os.path.exists(PATH):
+        empty_dict = {
+            "presentation_ID": 1234,
+            "topic": f"{topic}",
+            "slides": []
+            }
+        with open(PATH, 'w') as json_file:
+            json.dump(empty_dict, json_file, indent=3)
 
 def main():
     args = parse_args()
     input = args.input
     format = args.format.lower()
     host = args.host
+    topic = args.topic
     API_KEY = os.environ['DEEPGRAM_API_KEY']
+
+    generate_summary_file(topic)
 
     try:
         if input.lower().startswith("mic"):
-            asyncio.run(run(API_KEY, "mic", format, model=args.model, tier=args.tier, host=host, timestamps=args.timestamps))
+            asyncio.run(run(API_KEY, "mic", format, model=args.model, tier=args.tier, host=host, timestamps=args.timestamps, slide=args.slide))
         else:
             raise argparse.ArgumentTypeError(
                 f'🔴 {input} is an invalid input. Please enter the path to a WAV file, a valid stream URL, or "mic" to stream from your microphone.'

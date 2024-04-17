@@ -1,13 +1,16 @@
 import os
 import json
+import re
+import warnings
 from dotenv import find_dotenv, load_dotenv
-from langchain_core.prompts import (PromptTemplate, ChatPromptTemplate)
+from langchain_core.prompts import (ChatPromptTemplate, FewShotChatMessagePromptTemplate)
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain.output_parsers.openai_functions import JsonOutputFunctionsParser
 from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_community.utils.openai_functions import (convert_pydantic_to_openai_function)
 from utils.data_validation import SlideContentJSON
+from utils.prompts import instruction_example, instruction_example_prompt, instruction_prompt, generation_prompt, generation_example, generation_prompt_example
 
 
 def configure_llm(TEMPERATURE=0,LLM_MODEL='gpt-3.5-turbo'):
@@ -18,7 +21,9 @@ def configure_llm(TEMPERATURE=0,LLM_MODEL='gpt-3.5-turbo'):
      return model
 
 def generate_slide_summary(model, content_json):
-    prompt = ChatPromptTemplate.from_messages(
+    summary = "[There is no previous slide in the presenation to make a summary.]"
+    if content_json is not None:
+        prompt = ChatPromptTemplate.from_messages(
         [
             ("system", "You are a helpful assistant to the professor. Your job is provide summary of slides from the content provided by the professor"),
             ("human", """
@@ -29,7 +34,6 @@ def generate_slide_summary(model, content_json):
              enumeration : Body content of the slide in form of bullet points.
              equations : Description and LaTeX code related to mathematical equation described in the slide. Here tex_code is the LaTeX code of the equation and eq_desc is the caption for the equation.\n
              tables : Description and LaTeX code related to tables described in the slide. Here tex_code is the LaTeX code of the table and tab_desc is the caption for the tables.
-             figures : Figure type and Description of figures provided in the slide.\n
 
              Keep in mind that some elements in the dict might be empty as the slide may not contain all elements.\n
              Now I want you to carefully analyze this dictonary object by understanding the content of each element and provide a textual summary of not more than 100 words on what the slide as a whole describes.\n 
@@ -39,50 +43,96 @@ def generate_slide_summary(model, content_json):
              """)
         ]
         )
-    parser = StrOutputParser()
-    chain = prompt | model | parser
-    summary = chain.invoke({"content": content_json})
-    print(summary)
+        parser = StrOutputParser()
+        chain = prompt | model | parser
+        try:
+            summary = chain.invoke({"content": content_json})
+            print(f"🟢 (2/5) Generated slide summary of current slide")
+        except:
+            print(f"🔴 ERROR: Could not generate slide summary of current slide")
+    else:
+        print(f"🟢 (2/5) No summaries to generate for first slide of the presentation")
+
+
     return summary
 
-def generate_content(model, curr_slide_summary, disc_transcript):
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", "You are a helpful assistant to the professor. Your job is to generate the content for the next slide in a presentation based on the current slide and the transcript of the discussion on the current slide."),
-            ("human", """
-             I am providing you the summary of the current presentation slide and the corresponding transcript of the discussion that took place while presenting the slide.\n
-             Your job is analyze the conversation and the context of discussion using the transcript and current slide summary to generate the content of the next slide.\n
-             The discussion is provided in raw string format with no entity recognition as to who is speaking, hence you will have to extract information as to what content is requested for the next slide.\n
-             You have to generate the content in form of a JSON object, where:
-             slide_number : Represents the relative numbering of the slide in the presentation.\n
-             title : The title of the slide.\n
-             description : Body content of the slide in form of a descriptive paragraph.\n
-             enumeration : Body content of the slide in form of bullet points.
-             equations : Description and LaTeX code related to mathematical equation described in the slide. Here tex_code is the LaTeX code of the equation and eq_desc is the caption for the equation.\n
-             tables : Description and LaTeX code related to tables described in the slide. Here tex_code is the LaTeX code of the table and tab_desc is the caption for the tables.\n
-             
-             While generating content for equations and tables, also provide the Tex code and Description to render it in the presentation.\n
-             The summary of current slide being discussed:\n
-             {slide_summary}
-             \n
-             The transcript of the discussion on current slide:\n
-             {transcript}
-             \n
-             """)
-        ]
+def generate_insights(model, curr_slide_summary, disc_transcript):
+    example_prompt = ChatPromptTemplate.from_messages(
+            instruction_example_prompt
         )
-    openai_functions = [convert_pydantic_to_openai_function(SlideContentJSON)]
-    parser = JsonOutputFunctionsParser()
-    chain = prompt | model.bind(functions=openai_functions) | parser
-    nxt_slide_obj = chain.invoke({"slide_summary": curr_slide_summary, "transcript": disc_transcript})
-    print(nxt_slide_obj)
-    return nxt_slide_obj
 
+    few_shot_prompt = FewShotChatMessagePromptTemplate(
+            examples=instruction_example,
+            example_prompt=example_prompt
+        )
+    
+    prompt = ChatPromptTemplate.from_messages(
+            [
+                ('system', 'You are a helpful assistant. You have access to the internet'),
+                few_shot_prompt,
+                instruction_prompt
+
+            ]
+        )
+    elements = ['description', 'enumeration', 'tables', 'equations']
+    chain = prompt | model 
+
+    try:
+        output = chain.invoke({"transcript": disc_transcript, "summary": curr_slide_summary, "elements": elements})
+        print(f"🟢 (3/5) Constructed insights from the discussion and current slide summary")
+    except:
+        print(f"🔴 ERROR: Could not generate insights from discussion")
+
+    dict_output = json.loads(output.content)
+    return dict_output["output"]
+
+def generate_content(model, instructions, curr_slide_summary):
+    example_prompt = ChatPromptTemplate.from_messages(
+            generation_prompt_example
+        )
+
+    few_shot_prompt = FewShotChatMessagePromptTemplate(
+            examples=generation_example,
+            example_prompt=example_prompt
+        )
+    
+    prompt = ChatPromptTemplate.from_messages(
+            [
+                ('system', 'You are a helpful assistant. You have access to the internet'),
+                few_shot_prompt,
+                generation_prompt
+
+            ]
+        )
+    with warnings.catch_warnings(action="ignore"):
+        openai_functions = [convert_pydantic_to_openai_function(SlideContentJSON)]
+        parser = JsonOutputFunctionsParser()
+        model = ChatOpenAI(
+        model_name='gpt-4-turbo-2024-04-09', 
+        temperature=0,
+        )
+        chain = prompt | model.bind(functions=openai_functions) | parser
+
+        try:
+            output = chain.invoke({"instructions": instructions, "summary": curr_slide_summary})
+            print(f"🟢 (4/5) Generated content for the next slide")
+        except:
+            print(f"🔴 ERROR: Could not generate content for the next slide")
+
+    return output 
+
+def find_current_slide_number(path):
+    files = os.listdir(path)
+    txt_files = [file for file in files if re.match(r'\d+\.txt', file)]
+    numbers = [int(re.match(r'(\d+)\.txt', file).group(1)) for file in txt_files]
+    max_number = max(numbers) if numbers else None
+    return max_number
 
 def generate_next_slide(content_json, transcript):
     model = configure_llm()
     curr_slide_summary = generate_slide_summary(model, content_json)
-    nxt_slide_content = generate_content(model, curr_slide_summary, transcript)
+    nxt_slide_instructs = generate_insights(model, curr_slide_summary, transcript)
+    nxt_slide_content = generate_content(model, nxt_slide_instructs, curr_slide_summary)
     return nxt_slide_content
 
 def fetch_transcript(trs_file_path):
@@ -101,29 +151,39 @@ def save_slide_content_to_json(slide_content, file_path):
 
 
 def main():
-    slide_num = 1
+    TRANSCRIPTS_PATH = f'output/buffer/transcripts'
+    slide_num = find_current_slide_number(TRANSCRIPTS_PATH)
     load_dotenv(find_dotenv())
-    print(os.environ['OPENAI_API_KEY'])
-    PREV_SLIDE_PATH = f'data/{slide_num}.json'
-    TRANSCRIPTS_PATH = f'output/buffer/transcripts/{slide_num}.txt'
-    content_json = fetch_seed_content(PREV_SLIDE_PATH)
-    # transcript = """
-    # I have a doubt related to Gaussian Distributions.
-    # Sure, ask.
-    # I am confused between Culminative Density Function and Probibility function, can you explain the difference between them?
-    # Sure, I can, but let me know what kind of difference you would like to know.
-    # Yes, so if you can provide and differenciate the definitions between the two. 
-    # I see, should I also provide mathematical expressions for each, will that help to differenciate between them?
-    # Yes that would be quite helpful.
-    # Sure, the next slide will have the difference between the two and differnciate their mathematical expressions.
-    # """
-    transcript = fetch_transcript(TRANSCRIPTS_PATH)
-    print(transcript)
+    print("\nRunning Content Generation Module...")
+    CURR_SLIDE_PATH = f'data/1234.json'
+    if os.path.exists(CURR_SLIDE_PATH):
+        content_json = fetch_seed_content(CURR_SLIDE_PATH)
+    else:
+        content_json = {
+            'presentation_ID': 1234,
+            'topic': 'Heap',
+            'slides': []
+            }
+        
+    try:
+        transcript = fetch_transcript(os.path.join(TRANSCRIPTS_PATH, f'{slide_num}.txt'))
+        print(f"🟢 (1/5) Successfully fetched transcript for slide {slide_num}")
+    except:
+        print(f"🔴 ERROR: Could not fetch trancript for slide {slide_num}")
+    
 
-    next_slide_content = generate_next_slide(content_json["slides"][-1], transcript)
+    if content_json["slides"] != []:
+        next_slide_content = generate_next_slide(content_json["slides"][-1], transcript)
+    else:
+        next_slide_content = generate_next_slide(None, transcript)
+
     content_json["slides"].append(next_slide_content)
-    OUTPUT_PATH = 'output/buffer/content_json/1.json'
-    save_slide_content_to_json(content_json, OUTPUT_PATH)
+    OUTPUT_PATH = 'output/buffer/content_json/'
+    try:
+        save_slide_content_to_json(content_json, os.path.join(OUTPUT_PATH, f'{slide_num + 1}.json'))
+        print(f"🟢 (5/5) Saved content to {OUTPUT_PATH}")
+    except:
+        print(f"🔴 ERROR: Could not save content to {OUTPUT_PATH}")
 
 if __name__ == "__main__":
     main()
