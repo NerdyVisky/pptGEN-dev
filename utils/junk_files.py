@@ -22,3 +22,9 @@ for d in dirs:
             shutil.rmtree(file_path)
 
     print(f"deleted files/dirs in {d}")
+
+for file in os.listdir('output'):
+    # Check if the file is a JSON file and delete it
+    if file.endswith('.json'):
+        os.remove(os.path.join('output', file))
+        print(f"deleted file {file}")

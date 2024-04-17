@@ -36,7 +36,7 @@ instruction_prompt = ("human", """There is a discussion between a lecture presen
                       \n\n
                       Based on the transcript and the associated summary of the slide, I want you to extract the query posed in the transcript and how the query can be addressed in the next slide of the presentation.
                       Think out loud and walk me through your chain of thought as you first determine what is asked in the discussion and then based on the context determine the contents of the next slide.\n
-                      The output should be a Python dict having keys as reasoning and output. Output will have keys as slide_number, title, and elements. Generate upto 3 elements for the slide. The elements types are as follows:\n
+                      The output should be a Python dict having keys as reasoning and output. Output will have keys as slide_number, title, and elements. Total number of elements including all descriptions, enumeration, tables, and equations should strictly not exceed three. The elements types are as follows:\n
                       {elements}
                  """)
 

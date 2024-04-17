@@ -166,9 +166,8 @@ def remove_tmp_files():
                 os.remove(file_path)
 
 
-def generate_random_slide(slide_number, data, style_obj, footer_obj, presentation_ID):
+def generate_random_slide(slide_number, data, style_obj, footer_obj, date, presentation_ID):
     bg_color, title_font_family, title_font_bold, title_font_attr, desc_font_family, desc_font_attr = style_obj["bg_color"], style_obj["title_font_family"], style_obj["title_font_bold"], style_obj["title_font_attr"], style_obj["desc_font_family"], style_obj["desc_font_attr"]
-    date = style_obj["date"]
     # Determining when a slide has BG as White
     THRES = 0.667
     if generate_random_value(float, 0, 1) < THRES:
@@ -405,6 +404,47 @@ def generate_random_slide(slide_number, data, style_obj, footer_obj, presentatio
     
     return slide
 
+def generate_base_template():
+    style_obj = generate_random_style_obj()
+    footer_obj = generate_footer_obj()
+    new_data = {
+            "presentation_id": presentation_id,
+            "topic" : data["topic"],
+            "n_slides": 0,
+            "presenter": pick_random_presenter(),
+            "date": generate_random_date(),
+            "slides": []
+        }
+    date = new_data["date"]
+    return [style_obj, footer_obj, new_data, date]
+    
+def fetch_base_template(json_data):
+    new_data = json_data
+    footer_obj = []
+    prev_slide_temp = new_data["slides"][-1]
+    for ele in prev_slide_temp["elements"]["footer"]:
+        ele_type = ele["label"]
+        ele_location = ele["location"] - 1
+        footer_obj.append({ele_type: ele_location})
+    style_obj = {}
+    style_obj["bg_color"] = prev_slide_temp["bg_color"]
+    style_obj["title_font_bold"] = prev_slide_temp["elements"]["title"][0]["style"]["bold"]
+    style_obj["title_font_family"] = prev_slide_temp["elements"]["title"][0]["style"]["font_name"] 
+    style_obj["title_font_attr"] = {
+        "font_size": prev_slide_temp["elements"]["title"][0]["style"]["font_size"],
+        "bold": prev_slide_temp["elements"]["title"][0]["style"]["bold"],
+        "underline": prev_slide_temp["elements"]["title"][0]["style"]["underlined"],
+        "italics": prev_slide_temp["elements"]["title"][0]["style"]["italics"]
+    }
+    style_obj["desc_font_family"] = prev_slide_temp["elements"]["description"][0]["style"]["font_name"] 
+    style_obj["desc_font_attr"] = {
+        "font_size": prev_slide_temp["elements"]["description"][0]["style"]["font_size"],
+        "bold": prev_slide_temp["elements"]["description"][0]["style"]["bold"],
+        "underline": prev_slide_temp["elements"]["description"][0]["style"]["underlined"],
+        "italics": prev_slide_temp["elements"]["description"][0]["style"]["italics"]
+    }
+    date = new_data["date"]
+    return [style_obj, footer_obj, new_data, date] 
     
 
 if __name__ == "__main__":
@@ -414,28 +454,28 @@ if __name__ == "__main__":
     json_files = [f for f in os.listdir(buffer_dir) if f.endswith('.json')]
 
     for json_file in json_files: 
-        style_obj = generate_random_style_obj()
-        footer_obj = generate_footer_obj()
         # print(style_obj)
-        slide_id, _ = os.path.splitext(json_file)
+        presentation_id, _ = os.path.splitext(json_file)
         file_path = os.path.join(buffer_dir, json_file)
         with open(file_path, 'r') as file:
             data = json.load(file)
         n_slides = len(data["slides"])
-        slides = [generate_random_slide(i+1, data, style_obj, footer_obj, slide_id) for i in range(n_slides)]
-    
-        new_data = {
-            "slide_id": slide_id,
-            "n_slides": len(slides),
-            "topic" : data["topic"],
-            "presenter": pick_random_presenter(),
-            "date": generate_random_date(),
-            "slides": slides
-        }
+        if n_slides == 1:
+            print(f"🟢 (1/2) Generating new template for JSON with ID: {presentation_id}")
+            style_obj, footer_obj, new_data, date = generate_base_template()
+        else:
+            print(f"🟢 (1/2) Found existing presentation payload for JSON with ID: {presentation_id}")
+            with open(f"output/{presentation_id}.json", 'r') as json_file:
+                json_data = json.load(json_file)
+                style_obj, footer_obj, new_data, date = fetch_base_template(json_data)
+
+        new_slide = generate_random_slide(n_slides, data, style_obj, footer_obj, date, presentation_id)
+        new_data["n_slides"] = n_slides
+        new_data["slides"].append(new_slide)
         try:
-            with open(f"output/{slide_id}.json", 'w') as json_file:
+            with open(f"output/{presentation_id}.json", 'w') as json_file:
                 json.dump(new_data, json_file, indent=3)
-            print(f"🟢 (1/1) JSON payload saved to output/{slide_id}.json")
+            print(f"🟢 (2/2) JSON payload saved to output/{presentation_id}.json")
         except:
             print(f"🔴 ERROR: Could not create JSON payload")
 

@@ -5,9 +5,8 @@ import warnings
 from dotenv import find_dotenv, load_dotenv
 from langchain_core.prompts import (ChatPromptTemplate, FewShotChatMessagePromptTemplate)
 from langchain_openai import ChatOpenAI
-from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
+from langchain_core.output_parsers import StrOutputParser
 from langchain.output_parsers.openai_functions import JsonOutputFunctionsParser
-from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_community.utils.openai_functions import (convert_pydantic_to_openai_function)
 from utils.data_validation import SlideContentJSON
 from utils.prompts import instruction_example, instruction_example_prompt, instruction_prompt, generation_prompt, generation_example, generation_prompt_example
@@ -151,6 +150,7 @@ def save_slide_content_to_json(slide_content, file_path):
 
 
 def main():
+    PRESENTATION_ID = 1234
     TRANSCRIPTS_PATH = f'output/buffer/transcripts'
     slide_num = find_current_slide_number(TRANSCRIPTS_PATH)
     load_dotenv(find_dotenv())
@@ -160,7 +160,7 @@ def main():
         content_json = fetch_seed_content(CURR_SLIDE_PATH)
     else:
         content_json = {
-            'presentation_ID': 1234,
+            'presentation_ID': PRESENTATION_ID,
             'topic': 'Heap',
             'slides': []
             }
@@ -180,7 +180,7 @@ def main():
     content_json["slides"].append(next_slide_content)
     OUTPUT_PATH = 'output/buffer/content_json/'
     try:
-        save_slide_content_to_json(content_json, os.path.join(OUTPUT_PATH, f'{slide_num + 1}.json'))
+        save_slide_content_to_json(content_json, os.path.join(OUTPUT_PATH, f'{PRESENTATION_ID}.json'))
         print(f"🟢 (5/5) Saved content to {OUTPUT_PATH}")
     except:
         print(f"🔴 ERROR: Could not save content to {OUTPUT_PATH}")

@@ -206,10 +206,14 @@ class Footer(Element):
 
 
 class PresentationGenerator:
-    def __init__(self, json_payload, slide_id):
+    def __init__(self, json_payload, presentation_id):
         self.json_payload = json_payload
-        self.slide_id = slide_id
-        self.presentation = Presentation()
+        self.presentation_id = presentation_id
+        if os.path.exists(os.path.join('ppts', f'{presentation_id}.pptx')):
+            self.presentation = Presentation(os.path.join('ppts', f'{presentation_id}.pptx'))
+        else:
+            self.presentation = Presentation()
+            self.insert_title_slide()
     
     def insert_title_slide(self):
         title_font = self.json_payload["slides"][0]["elements"]["title"][0]["style"]["font_name"]
@@ -235,37 +239,37 @@ class PresentationGenerator:
         date.text_frame.paragraphs[0].font.name = title_font
 
     def generate_presentation(self):
-        self.insert_title_slide()
-        for slide_info in self.json_payload['slides']:
-            slide_layout = self.presentation.slide_layouts[1]
-            slide = self.presentation.slides.add_slide(slide_layout)
-            slide.background.fill.solid()
-            if slide_info['bg_color']:
-                slide.background.fill.fore_color.rgb = RGBColor(slide_info['bg_color']['r'], slide_info['bg_color']['g'], slide_info['bg_color']['b'])
-            else:
-                slide.background.fill.fore_color.rgb = RGBColor(255, 255, 255)
+        slide_info = self.json_payload['slides'][-1]
+        slide_layout = self.presentation.slide_layouts[1]
+        slide = self.presentation.slides.add_slide(slide_layout)
+        slide.background.fill.solid()
+        if slide_info['bg_color']:
+            slide.background.fill.fore_color.rgb = RGBColor(slide_info['bg_color']['r'], slide_info['bg_color']['g'], slide_info['bg_color']['b'])
+        else:
+            slide.background.fill.fore_color.rgb = RGBColor(255, 255, 255)
 
-            for element_type, elements in slide_info['elements'].items():
-                for element_info in elements:
-                    if element_type == 'figures':
-                        element = Figure(element_info['path'], element_info['caption']['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']), element_info['caption'])
-                    elif element_type == 'equations':
-                        element = Equation(element_info['path'], None, (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']))
-                    elif element_type == 'tables':
-                        element = Table(element_info['path'], None, (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']))
-                    elif element_type == 'description':
-                        if element_info['label'] == "enumeration":
-                            element = Enumeration(element_info['value'], element_info['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']), element_info['heading'])
-                        else:
-                            element = Description(element_info['value'], element_info['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']))
-                    elif element_type == 'title':
-                        element = Title(element_info['value'], element_info['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']))
-                    elif element_type == 'footer':
-                        element = Footer(element_info['value'], element_info['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']), element_info['location'])
+        for element_type, elements in slide_info['elements'].items():
+            for element_info in elements:
+                if element_type == 'figures':
+                    element = Figure(element_info['path'], element_info['caption']['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']), element_info['caption'])
+                elif element_type == 'equations':
+                    element = Equation(element_info['path'], None, (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']))
+                elif element_type == 'tables':
+                    element = Table(element_info['path'], None, (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']))
+                elif element_type == 'description':
+                    if element_info['label'] == "enumeration":
+                        element = Enumeration(element_info['value'], element_info['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']), element_info['heading'])
                     else:
-                        raise ValueError(f"Unsupported element type: {element_type}")
+                        element = Description(element_info['value'], element_info['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']))
+                elif element_type == 'title':
+                    element = Title(element_info['value'], element_info['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']))
+                elif element_type == 'footer':
+                    element = Footer(element_info['value'], element_info['style'], (element_info['xmin'], element_info['ymin'], element_info['width'], element_info['height']), element_info['location'])
+                else:
+                    raise ValueError(f"Unsupported element type: {element_type}")
 
-                    element.render(slide)
+                element.render(slide)
+
 
     
         # Clean-up empty elements
@@ -277,11 +281,12 @@ class PresentationGenerator:
                         sp = slide.shapes._spTree
                         sp.remove(shape._element)
         
-        ppts_path = "./ppts/"
+        ppts_path = "ppts"
         if os.path.isdir(ppts_path) == False:
             os.mkdir(ppts_path)
 
-        self.presentation.save(os.path.join(ppts_path, f'{self.slide_id}.pptx'))
+        self.presentation.save(os.path.join(ppts_path, f'{self.presentation_id}.pptx'))
+        os.startfile(os.path.join(ppts_path, f'{self.presentation_id}.pptx'))
 
 def load_json_payload(file_path):
     with open(file_path, 'r') as file:
@@ -297,26 +302,27 @@ def main():
 
     for json_file in json_files:
         #Load JSON file from buffer
-        slide_id , _ = os.path.splitext(json_file)
+        presentation_id , _ = os.path.splitext(json_file)
         json_file_path = os.path.join(buffer_folder_path, json_file)
         json_payload = load_json_payload(json_file_path)
-
+        # presentation_id = json_payload["n_slides"]
         #Generate Presentation from JSON file and save it
-        presentation_generator = PresentationGenerator(json_payload, slide_id)
+        presentation_generator = PresentationGenerator(json_payload, presentation_id)
         try:
             presentation_generator.generate_presentation()
-            print(f"🟢 (1/1) Presentation generated for {slide_id}.")
+            print(f"🟢 (1/1) Generated New presentation: {presentation_id}.")
         except:
             print(f"🔴 ERROR: in generating presentation")
-
+        
+    
         #Move JSON file from buffer to respective topic folder
         if not os.path.exists(base_topic_folder_path):
             os.makedirs(base_topic_folder_path)
 
-        destination_file_path = os.path.join(base_topic_folder_path, json_file)
-        os.rename(json_file_path, destination_file_path)
-        print(f"Moved {json_file} to {base_topic_folder_path}.")
-        print('\n')
+        # destination_file_path = os.path.join(base_topic_folder_path, json_file)
+        # os.rename(json_file_path, destination_file_path)
+        # print(f"Moved {json_file} to {base_topic_folder_path}.")
+        # print('\n')
     
 if __name__ == "__main__":
     main()
