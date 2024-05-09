@@ -10,21 +10,22 @@ instruction_example = [
         """,
         "elements": """["description", "enumeration", "equations", "tables"]""",
         "reasoning": """
+         The disucssion is about different probability density functions in Gaussian Distributions. The professor is asked by a student to differenciate between Probability Density Function and Culminative Density Function. The student wants a descriptive difference between the two and mathematical equations for both the function. Hence we are requried to the three elements in the next slide: a descriptive difference and two equations.
         """,
         "output": """
-        {{
+        {
          "slide_number": 2,
          "title": PDF v/s CDF,
-         "elements": [{{
+         "elements": [{
          "element_type": "description", "element_desc": "A short paragraph differenciating Probability Density Function and Culminative Density Function."
-         }},
-         {{
+         },
+         {
          "element_type": "equation", "element_desc": "Mathematical equation of the Probability Density Function"
-         }},
-         {{
+         },
+         {
          "element_type": "equation", "element_desc": "Mathematical equation of the Culminative Density Function"
-         }}]
-        }}
+         }]
+        }
         """
     }
 ]
@@ -68,40 +69,40 @@ instruction_example_prompt = [
 generation_example = [
        {
        "instructions": """
-       {{
+       {
         "slide_number": 2,
         "title": PDF v/s CDF,
-        "elements": [{{
+        "elements": [{
         "element_type": "descirption", "element_desc": "A short paragraph differenciating Probability Density Function and Culminative Density Function."
-        }},
-        {{
+        },
+        {
         "element_type": "equation", "element_desc": "Mathematical equation of the Probability Density Function"
-        }},
-        {{
+        },
+        {
         "element_type": "equation", "element_desc": "Mathematical equation of the Culminative Density Function"
-        }}
+        }
         ]
-       }}
+       }
        """,
        "output": """
-        {{
+        {
             "slide_number": 2,
             "title": "PDF v/s CDF",
             "description": "A Probability Density Function (PDF) characterizes the probability distribution of a continuous random variable, representing the likelihood of the variable falling within a specific range of values. In contrast, a Cumulative Density Function (CDF) provides the cumulative probability that a random variable is less than or equal to a given value.",
             "enumeration": [],
             "equations": [
-                {{
+                {
                     "eq_desc": "Mathematical equation of the Probability Density Function",
-                    "tex_code": "f(x | \mu, \sigma) = \\frac{{1}}{{\sigma \sqrt{{2\pi}}}} \exp\left(-\\frac{{(x - \mu)^2}}{{2\sigma^2}}\\right)"
-                }},
-                {{
+                    "tex_code": "f(x | \mu, \sigma) = \\frac{1}{\sigma \sqrt{2\pi}} \exp\left(-\\frac{(x - \mu)^2}{2\sigma^2}\\right)"
+                },
+                {
                     "eq_desc": "Mathematical equation of the Culminative Density Function",
-                    "tex_code": "F(x | \mu, \sigma) = \\frac{1}{2} \left[1 + \\text{erf}\left(\\frac{{x - \mu}}{{\sigma \sqrt{{2}}}}\\right)\\right]"
-                }}
+                    "tex_code": "F(x | \mu, \sigma) = \\frac{1}{2} \left[1 + \\text{erf}\left(\\frac{x - \mu}{\sigma \sqrt{2}}\\right)\\right]"
+                }
             ],
             "tables":[],
             "figures": []
-        }}
+        }
        """ 
     }]
 generation_prompt_example =  [
@@ -144,5 +145,5 @@ generation_prompt = ("human", """
                  \t c. The description should not be more than 30 words long.\n
                  \t d. The enumeration should not have more than 4 points.\n
                  The presentation content should be generated in form of a JSON object.
-                 While generating LaTeX code, make sure to escape the string as it will be part of a JSON object.
+                 While generating LaTeX code, make sure to escape the string as it will be part of a JSON object. Do not add any line breaks or other escape sequences in the JSON object.
                  """)

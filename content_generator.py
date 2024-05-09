@@ -75,13 +75,11 @@ def generate_insights(model, curr_slide_summary, disc_transcript):
         )
     elements = ['description', 'enumeration', 'tables', 'equations']
     chain = prompt | model 
-
     try:
         output = chain.invoke({"transcript": disc_transcript, "summary": curr_slide_summary, "elements": elements})
         print(f"🟢 (3/5) Constructed insights from the discussion and current slide summary")
     except:
         print(f"🔴 ERROR: Could not generate insights from discussion")
-
     dict_output = json.loads(output.content)
     return dict_output["output"]
 
@@ -107,10 +105,11 @@ def generate_content(model, instructions, curr_slide_summary):
         openai_functions = [convert_pydantic_to_openai_function(SlideContentJSON)]
         parser = JsonOutputFunctionsParser()
         model = ChatOpenAI(
-        model_name='gpt-4-turbo-2024-04-09', 
+        model_name='gpt-4-turbo', 
         temperature=0,
         )
         chain = prompt | model.bind(functions=openai_functions) | parser
+        # chain = prompt | model.bind(functions=openai_functions)
 
         try:
             output = chain.invoke({"instructions": instructions, "summary": curr_slide_summary})
@@ -118,6 +117,7 @@ def generate_content(model, instructions, curr_slide_summary):
         except:
             print(f"🔴 ERROR: Could not generate content for the next slide")
 
+   
     return output 
 
 def find_current_slide_number(path):
