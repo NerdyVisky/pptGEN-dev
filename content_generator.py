@@ -11,6 +11,7 @@ from langchain_community.utils.openai_functions import (convert_pydantic_to_open
 from utils.data_validation import SlideContentJSON
 from utils.prompts import instruction_example, instruction_example_prompt, instruction_prompt, generation_prompt, generation_example, generation_prompt_example
 
+# Old branch code
 
 def configure_llm(TEMPERATURE=0,LLM_MODEL='gpt-3.5-turbo'):
      model = ChatOpenAI(
