@@ -18,6 +18,7 @@ from PIL import Image
 from io import BytesIO 
 import subprocess
 import fitz
+import graphviz
 
 
 
@@ -110,37 +111,20 @@ def get_tab_img_path(tex_code, slide_number, tab_num):
     os.rename(img_name, img_path)
     return img_path
 
-def get_fig_img_path(tex_code, slide_number, fig_num):
+def get_fig_img_path(dot_code, slide_number, fig_num):
     img_dir = 'output/figures/'
-    img_name = f'fig_{slide_number}_{fig_num + 1}.png'
-    dpi = 600
-    tex_file = f'tmp.tex'
-    with open(tex_file, 'w') as latexfile:
-        latexfile.write('\\documentclass[preview]{standalone}\n')
-        latexfile.write('\\usepackage{tikz}\n')
-        latexfile.write('\\usepackage{graphicx}\n')
-        latexfile.write('\\begin{document}\n')
-        latexfile.write('%s\n' % tex_code)
-        latexfile.write('\\end{document}\n')
-    subprocess.call(['pdflatex', '-interaction=nonstopmode', tex_file], creationflags=subprocess.CREATE_NO_WINDOW)
-    doc = fitz.open(f'tmp.pdf')
-    pix = doc[0].get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))
-    pix.save(img_name)
-    img_path = os.path.join(img_dir, img_name)
-    os.rename(img_name, img_path)
+    img_name = f'fig_{slide_number}_{fig_num + 1}'
+    try:
+        graph = graphviz.Source(dot_code)
+        img_path_wo_ext = os.path.join(img_dir, img_name)
+        graph.render(filename=img_path_wo_ext, format='png', cleanup=True)
+        img_path = img_path_wo_ext + '.png'
+    except Exception as e:
+        print(f"Error rendering figure: {e}.")
+
     return img_path    
 
-def get_fig_img_path_matplot(tex_code, slide_number, fig_num):
-    img_dir = 'output/figures/'
-    img_name = f'fig_{slide_number}_{fig_num + 1}.png'
-    dpi = 600
-    plt.figure(figsize=(8, 6))
-    exec(tex_code)
-    plt.savefig(img_name)
-    
-    img_path = os.path.join(img_dir, img_name)
-    os.rename(img_name, img_path)
-    return img_path
+
 
 def remove_tmp_files():
     os.remove(f'tmp.tex')
@@ -341,7 +325,7 @@ def generate_random_slide(slide_number, data, style_obj, footer_obj, date, prese
             img_path = get_fig_img_path(data["slides"][slide_number - 1]["figures"][i]['fig_code'], slide_number, i)
             resized_img_path, n_w, n_h = resize_image(img_path, slide_number, i, resized_path, all_dims['body'][element_index]['width'], all_dims['body'][element_index]['height'])
             fig_instance = {
-            "label": data["slides"][slide_number - 1]["figures"][i]["label"],
+            "label": "diagram",
             "caption": {
                 "value": data["slides"][slide_number - 1]["figures"][i]["fig_desc"],
                 "xmin": all_dims['body'][element_index]['left'],

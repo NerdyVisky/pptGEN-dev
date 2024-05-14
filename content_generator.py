@@ -74,14 +74,19 @@ def generate_insights(model, curr_slide_summary, disc_transcript):
 
             ]
         )
-    elements = ['description', 'enumeration', 'tables', 'equations']
+    slide_templates = ['introduction', 'content', 'example', 'comparision', 'summary']
+    elements = ['description', 'enumeration', 'url', 'tables', 'equations', 'diagram']
     chain = prompt | model 
+    output = chain.invoke({"transcript": disc_transcript, "summary": curr_slide_summary, "slide_templates": slide_templates, "elements": elements})
+    # dict_output = json.loads(output.content)
+
     try:
-        output = chain.invoke({"transcript": disc_transcript, "summary": curr_slide_summary, "elements": elements})
+        output = chain.invoke({"transcript": disc_transcript, "summary": curr_slide_summary, "slide_templates": slide_templates, "elements": elements})
+        dict_output = json.loads(output.content)
         print(f"🟢 (3/5) Constructed insights from the discussion and current slide summary")
     except:
         print(f"🔴 ERROR: Could not generate insights from discussion")
-    dict_output = json.loads(output.content)
+
     return dict_output["output"]
 
 def generate_content(model, instructions, curr_slide_summary):
