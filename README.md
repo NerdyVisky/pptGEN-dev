@@ -2,6 +2,8 @@
 
 An open-source project initiated during a research fellowship on Lecture Presentation Understanding at IIIT Hyderabad.
 
+![Demo GIF](https://raw.githubusercontent.com/NerdyVisky/pptGEN-dev/main/teaser.gif)
+
 ## Overview
 
 **pptGEN** is an executable application designed to generate lecture slides within 15 seconds, synchronizing with live speech from the professor. This project utilizes advanced technologies such as Large Language Models (LLMs) to craft coherent multimodal content, automatically assigns appropriate slide layouts, and preserves the overall presentation style across the generated slides.
