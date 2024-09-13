@@ -2,29 +2,32 @@ import random
 from datetime import datetime
 
 FONT_STYLES = ['Arial', 'Times New Roman', 'Georgia', 'Calibiri']
-PRESENTERS = [
-    "Dr. Marcella Nguyen",
-    "Prof. Benjamin Frost",
-    "Dr. Isabella Patel",
-    "Prof. Nathanial Lawson",
-    "Dr. Lydia Chen",
-    "Prof. Winston Harper",
-    "Dr. Gabrielle Santiago",
-    "Prof. Marcus Sinclair",
-    "Dr. Elena Petrov",
-    "Prof. Desmond Washington",
-    "Dr. Sophia Alvarez",
-    "Prof. Samuel Fitzgerald",
-    "Dr. Emily Roberts",
-    "Prof. Xavier Lee",
-    "Dr. Fiona O'Malley",
-    "Prof. Harrison Grant",
-    "Dr. Vivian Chang",
-    "Prof. Gregory Jensen",
-    "Dr. Jasmine Khan",
-    "Prof. Oliver Martin"
-]
+# PRESENTERS = [
+#     "Dr. Marcella Nguyen",
+#     "Prof. Benjamin Frost",
+#     "Dr. Isabella Patel",
+#     "Prof. Nathanial Lawson",
+#     "Dr. Lydia Chen",
+#     "Prof. Winston Harper",
+#     "Dr. Gabrielle Santiago",
+#     "Prof. Marcus Sinclair",
+#     "Dr. Elena Petrov",
+#     "Prof. Desmond Washington",
+#     "Dr. Sophia Alvarez",
+#     "Prof. Samuel Fitzgerald",
+#     "Dr. Emily Roberts",
+#     "Prof. Xavier Lee",
+#     "Dr. Fiona O'Malley",
+#     "Prof. Harrison Grant",
+#     "Dr. Vivian Chang",
+#     "Prof. Gregory Jensen",
+#     "Dr. Jasmine Khan",
+#     "Prof. Oliver Martin"
+# ]
 
+PRESENTERS = [
+    'Dr. Vishvesh Trivedi'
+]
 
 def generate_random_color():
     return {"r": random.randint(0, 255), "g": random.randint(0, 255), "b": random.randint(0, 255)}
@@ -64,11 +67,12 @@ def generate_random_date():
     else:
         date_str = datetime(year=random.randint(2018, 2024), month=random.randint(1, 12), day=random.randint(1, 28))
     
-    return date_str.strftime(chosen_format)
+    # return date_str.strftime(chosen_format)
+    return datetime.today().strftime('%m %d %Y')
 
 def generate_footer_obj():
-    showSN = random.random() > 0.25
-    showDt = random.random() > 0.5
+    showSN = random.random() > 0
+    showDt = random.random() > 0
     showFN = random.random() > 0.75 
     total_footer_elements = 0
     if showSN:
