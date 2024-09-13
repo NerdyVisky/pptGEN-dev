@@ -8,6 +8,8 @@ An open-source project initiated during a research fellowship on Lecture Present
 
 **pptGEN** is an executable application designed to generate lecture slides within 15 seconds, synchronizing with live speech from the professor. This project utilizes advanced technologies such as Large Language Models (LLMs) to craft coherent multimodal content, automatically assigns appropriate slide layouts, and preserves the overall presentation style across the generated slides.
 
+![Userflow Diagram](https://raw.githubusercontent.com/NerdyVisky/pptGEN-dev/main/userflow_diagram.png)
+
 ### Key Features:
 - **Real-time Slide Generation:** Produces lecture slides on-the-fly as the speaker presents.
 - **Modular Pipeline:** A lightweight and modular architecture for efficient content generation and slide layout assignment.
