@@ -127,10 +127,14 @@ def get_fig_img_path(dot_code, slide_number, fig_num):
 
 
 def remove_tmp_files():
-    os.remove(f'tmp.tex')
-    os.remove(f'tmp.aux')
-    os.remove(f'tmp.log')
-    os.remove(f'tmp.pdf')
+    # os.remove(f'tmp.tex')
+    # os.remove(f'tmp.aux')
+    # os.remove(f'tmp.log')
+    # os.remove(f'tmp.pdf')
+    junk_paths = ['tmp.tex', 'tmp.aux', 'tmp.log', 'tmp.pdf']
+    for path in junk_paths:
+        if os.path.exists(path):
+            os.remove(path)
     tmp_eqs = 'output/equations'
     for filename in os.listdir(tmp_eqs):
             file_path = os.path.join(tmp_eqs, filename)

@@ -13,11 +13,15 @@ from utils.prompts import instruction_example, instruction_example_prompt, instr
 
 # Old branch code
 
-def configure_llm(TEMPERATURE=0,LLM_MODEL='gpt-3.5-turbo'):
+
+
+def configure_llm(TEMPERATURE=0,LLM_MODEL='gpt-3.5-turbo', print_API_KEY=True):
      model = ChatOpenAI(
        model_name=LLM_MODEL, 
        temperature=TEMPERATURE,
        )
+     if print_API_KEY:
+         print(os.environ['OPENAI_API_KEY'])
      return model
 
 def generate_slide_summary(model, content_json):
